@@ -1,0 +1,11 @@
+venv/
+**/migrations/*
+**/__pycache__/
+.idea/
+media/docs/
+media/data/
+media/result/
+__pycache__/
+*.py[cod]
+*$py.class
+db.sqlite3
