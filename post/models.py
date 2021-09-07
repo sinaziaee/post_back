@@ -9,3 +9,7 @@ class Post(models.Model):
     description = models.TextField(max_length=250, null=False, blank=False)
     time = models.DateTimeField(default=datetime.now(), null=False, blank=False)
     image = models.ImageField(upload_to='images/posts/')
+
+    def __str__(self):
+        return f'ID: {self.pk}, Title: {self.title}, Uploader: {self.uploader.username}'
+
