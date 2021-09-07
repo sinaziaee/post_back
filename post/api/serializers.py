@@ -1,18 +1,22 @@
 from rest_framework import serializers
-from rest_framework.fields import ReadOnlyField
-
 from post.models import *
 from django.contrib.auth.models import User
+
+
+class UploaderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name')
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ('username', 'password', 'email', 'first_name', 'last_name')
 
 
 class PostSerializer(serializers.ModelSerializer):
-    uploader = UserSerializer()
+    uploader = UploaderSerializer()
 
     class Meta:
         model = Post

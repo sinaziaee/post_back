@@ -23,52 +23,70 @@ def home(request):
 def post_all(request):
     posts = Post.objects.all().values()
     serializer = PostSerializer(data=posts, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.initial_data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST', ])
 @permission_classes((IsAuthenticated,))
 def post_create(request):
-    return None
+    current_user = request.user
+    req_body = request.body
+    js = json.loads(req_body)
+    post = Post(title=js['title'], description=js['description'], uploader=current_user)
+    if 'image' in request.data.keys():
+        post.image = request.data['image']
+    post.time = datetime.now()
+    post.save()
+    serializer = PostSerializer(post)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['DELETE', ])
 @permission_classes((IsAuthenticated,))
-def post_delete(request):
-    id = request.query_params.get('id', None)
+def post_delete(request, id):
     if id is None:
         return Response({'status': 'No ID sent'}, status=status.HTTP_400_BAD_REQUEST)
-    post = Post.objects.get(pk=id)
-    if post is None:
+    count = Post.objects.filter(pk=id).count()
+    if count == 0:
         return Response({'status': f'Post with ID: {id} not found'}, status=status.HTTP_400_BAD_REQUEST)
+    post = Post.objects.get(pk=id)
     post.delete()
-    return Response({'status': f'Successfully deleted the post'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'status': f'Successfully deleted the post'}, status=status.HTTP_200_OK)
 
 
 @api_view(['PUT', ])
 @permission_classes((IsAuthenticated,))
-def post_update(request):
-    id = request.query_params.get('id', None)
-    print(request.query_params)
+def post_update(request, id):
     if id is None:
         return Response({'status': 'No ID sent'}, status=status.HTTP_400_BAD_REQUEST)
-    post = Post.objects.get(pk=id)
-    if post is None:
+    count = Post.objects.filter(pk=id).count()
+    if count == 0:
         return Response({'status': f'Post with ID: {id} not found'}, status=status.HTTP_400_BAD_REQUEST)
-    post.delete()
-    return Response({'status': f'Successfully deleted the post'}, status=status.HTTP_400_BAD_REQUEST)
+    post = Post.objects.get(pk=id)
+    req_body = request.body
+    js = json.loads(req_body)
+    if js['title'] is not None:
+        post.title = js['title']
+    if js['description'] is not None:
+        post.description = js['description']
+    if 'image' in request.data.keys():
+        post.image = request.data['image']
+    post.time = datetime.now()
+    post.save()
+    serializer = PostSerializer(post)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET', ])
 @permission_classes((IsAuthenticated,))
-def post_get(request):
-    id = request.query_params.get('id', None)
+def post_get(request, id):
     if id is None:
         return Response({'status': 'No ID sent'}, status=status.HTTP_400_BAD_REQUEST)
-    post = Post.objects.get(pk=id)
-    if post is None:
+    count = Post.objects.filter(pk=id).count()
+    if count == 0:
         return Response({'status': f'Post with ID: {id} not found'}, status=status.HTTP_400_BAD_REQUEST)
-    serializer = PostSerializer(data=post)
+    post = Post.objects.get(pk=id)
+    serializer = PostSerializer(post)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -129,9 +147,3 @@ def login(request):
     js = json.dumps(data, indent=None)
     return Response(json.loads(js),
                     status=status.HTTP_200_OK)
-
-
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    permission_classes = (AllowAny,)
-    serializer_class = RegisterSerializer
