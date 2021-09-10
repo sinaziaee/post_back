@@ -2,9 +2,7 @@ venv/
 **/migrations/*
 **/__pycache__/
 .idea/
-media/docs/
-media/data/
-media/result/
+media/
 __pycache__/
 *.py[cod]
 *$py.class

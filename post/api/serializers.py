@@ -12,7 +12,7 @@ class UploaderSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'password', 'email', 'first_name', 'last_name')
+        fields = ('username', 'password', 'email', 'first_name', 'last_name', 'pk')
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -24,6 +24,8 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    id = 'pk'
+
     class Meta:
         model = User
         fields = ('username', 'password', 'email', 'first_name', 'last_name')
