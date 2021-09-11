@@ -79,6 +79,8 @@ def post_update(request, id):
     if count == 0:
         return Response({'status': f'Post with ID: {id} not found'}, status=status.HTTP_400_BAD_REQUEST)
     post = Post.objects.get(pk=id)
+    if request.user.pk != post.uploader.pk:
+        return Response({'status': f'You are not the post creator'}, status=status.HTTP_403_FORBIDDEN)
     if 'file' in data.keys():
         new_file = request.FILES.get('file')
         # print(js)
